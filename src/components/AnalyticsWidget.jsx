@@ -1,22 +1,53 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { CheckCircle2, ListTodo, TrendingUp, Target } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function AnalyticsWidget({ analytics }) {
   const { completedToday, totalTasks, completedTasks, weeklyData } = analytics;
+  const navigate = useNavigate();
   const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   const stats = [
-    { label: 'Done Today', value: completedToday, icon: CheckCircle2, color: 'var(--success)' },
-    { label: 'Total Tasks', value: totalTasks, icon: ListTodo, color: 'var(--accent)' },
-    { label: 'Completed', value: completedTasks, icon: Target, color: 'var(--warning)' },
-    { label: 'Progress', value: `${percentage}%`, icon: TrendingUp, color: 'var(--priority-high)' },
+    { 
+      label: 'Done Today', 
+      value: completedToday, 
+      icon: CheckCircle2, 
+      color: 'var(--success)',
+      path: '/today'
+    },
+    { 
+      label: 'Total Tasks', 
+      value: totalTasks, 
+      icon: ListTodo, 
+      color: 'var(--accent)',
+      path: '/today'
+    },
+    { 
+      label: 'Completed', 
+      value: completedTasks, 
+      icon: Target, 
+      color: 'var(--warning)',
+      path: '/completed'
+    },
+    { 
+      label: 'Progress', 
+      value: `${percentage}%`, 
+      icon: TrendingUp, 
+      color: 'var(--priority-high)',
+      path: '/completed'
+    },
   ];
 
   return (
     <>
       <div className="analytics-grid">
         {stats.map(stat => (
-          <div className="stat-card" key={stat.label}>
+          <div 
+            className="stat-card" 
+            key={stat.label}
+            onClick={() => navigate(stat.path)}
+            style={{ cursor: 'pointer' }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <div className="stat-label">{stat.label}</div>
