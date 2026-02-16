@@ -12,7 +12,7 @@ import PomodoroTimer from '../components/PomodoroTimer';
 export default function Dashboard() {
   const {
     tasks, allTasks, categories, loading, filter, setFilter,
-    addTask, updateTask, deleteTask, toggleComplete, reorderTasks, analytics,
+    addTask, updateTask, deleteTask, toggleComplete, reorderTasks, addCategory, analytics,
   } = useTasks();
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
@@ -129,6 +129,7 @@ export default function Dashboard() {
           categories={categories}
           onSave={handleSave}
           onClose={handleClose}
+          onAddCategory={addCategory}
         />
       )}
     </>

@@ -9,7 +9,7 @@ import SearchBar from '../components/SearchBar';
 export default function TodayTasks() {
   const {
     tasks, categories, loading, filter, setFilter,
-    addTask, updateTask, deleteTask, toggleComplete, reorderTasks,
+    addTask, updateTask, deleteTask, toggleComplete, reorderTasks, addCategory,
   } = useTasks();
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
@@ -86,7 +86,7 @@ export default function TodayTasks() {
       <button className="fab" onClick={() => setShowForm(true)} title="Add task (N)"><Plus /></button>
 
       {showForm && (
-        <TaskForm task={editingTask} categories={categories} onSave={handleSave} onClose={handleClose} />
+        <TaskForm task={editingTask} categories={categories} onSave={handleSave} onClose={handleClose} onAddCategory={addCategory} />
       )}
     </>
   );

@@ -9,7 +9,7 @@ import SearchBar from '../components/SearchBar';
 export default function UpcomingTasks() {
   const {
     tasks, categories, loading, filter, setFilter,
-    addTask, updateTask, deleteTask, toggleComplete, reorderTasks,
+    addTask, updateTask, deleteTask, toggleComplete, reorderTasks, addCategory,
   } = useTasks();
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
@@ -78,7 +78,7 @@ export default function UpcomingTasks() {
       )}
 
       <button className="fab" onClick={() => setShowForm(true)} title="Add task (N)"><Plus /></button>
-      {showForm && <TaskForm task={editingTask} categories={categories} onSave={handleSave} onClose={handleClose} />}
+      {showForm && <TaskForm task={editingTask} categories={categories} onSave={handleSave} onClose={handleClose} onAddCategory={addCategory} />}
     </>
   );
 }

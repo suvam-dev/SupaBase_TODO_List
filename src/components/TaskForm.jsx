@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { X } from 'lucide-react';
+import { X, Plus, Check } from 'lucide-react';
 
-export default function TaskForm({ task, categories, onSave, onClose }) {
+export default function TaskForm({ task, categories, onSave, onClose, onAddCategory }) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -10,7 +10,10 @@ export default function TaskForm({ task, categories, onSave, onClose }) {
     category_id: '',
   });
   const [saving, setSaving] = useState(false);
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
   const titleRef = useRef(null);
+  const newCatInputRef = useRef(null);
 
   useEffect(() => {
     if (task) {
@@ -25,6 +28,12 @@ export default function TaskForm({ task, categories, onSave, onClose }) {
     // Focus title input
     setTimeout(() => titleRef.current?.focus(), 100);
   }, [task]);
+
+  useEffect(() => {
+    if (isAddingCategory) {
+      setTimeout(() => newCatInputRef.current?.focus(), 100);
+    }
+  }, [isAddingCategory]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,8 +59,28 @@ export default function TaskForm({ task, categories, onSave, onClose }) {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Escape') onClose();
+    if (e.key === 'Escape') {
+        if (isAddingCategory) {
+            setIsAddingCategory(false);
+        } else {
+            onClose();
+        }
+    }
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleSubmit(e);
+  };
+
+  const handleSaveCategory = async () => {
+    if (!newCategoryName.trim() || !onAddCategory) return;
+    try {
+      const newCat = await onAddCategory(newCategoryName.trim());
+      if (newCat) {
+        setFormData(prev => ({ ...prev, category_id: newCat.id }));
+        setIsAddingCategory(false);
+        setNewCategoryName('');
+      }
+    } catch (err) {
+      console.error('Failed to add category:', err);
+    }
   };
 
   return (
@@ -118,20 +147,69 @@ export default function TaskForm({ task, categories, onSave, onClose }) {
           </div>
 
           <div className="form-group">
-            <label>Category</label>
-            <select
-              name="category_id"
-              className="form-input"
-              value={formData.category_id}
-              onChange={handleChange}
-            >
-              <option value="">No category</option>
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+            <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              Category
+              {!isAddingCategory && onAddCategory && (
+                <button
+                  type="button"
+                  className="btn-text"
+                  onClick={() => setIsAddingCategory(true)}
+                  style={{ fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}
+                >
+                  <Plus size={12} /> New Category
+                </button>
+              )}
+            </label>
+            
+            {isAddingCategory ? (
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input
+                  ref={newCatInputRef}
+                  type="text"
+                  className="form-input"
+                  placeholder="Category name"
+                  value={newCategoryName}
+                  onChange={e => setNewCategoryName(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleSaveCategory();
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleSaveCategory}
+                  disabled={!newCategoryName.trim()}
+                  style={{ padding: '0 12px' }}
+                >
+                  <Check size={16} />
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setIsAddingCategory(false)}
+                  style={{ padding: '0 12px' }}
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ) : (
+              <select
+                name="category_id"
+                className="form-input"
+                value={formData.category_id}
+                onChange={handleChange}
+              >
+                <option value="">No category</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           <div className="form-actions">
